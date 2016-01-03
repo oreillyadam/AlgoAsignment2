@@ -1,0 +1,369 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.ArrayList;
+
+
+// or i could have used import java.*; as there are so many imports
+import edu.princeton.cs.introcs.In;
+
+
+
+
+
+public class Recomender {
+
+	private ArrayList<Users> users;
+	private ArrayList<Movies> movies;
+	private ArrayList<String> generes;
+	private Serilizer Serilizer;
+
+
+	public Recomender(Serilizer Serilizer) throws Exception{
+		users = new ArrayList<Users>();
+		movies = new ArrayList<Movies>();
+		generes = new ArrayList<String>();
+		setUpArrayList();                        
+		
+		this.Serilizer=Serilizer;
+	}
+	
+	public static void main(String[] args){
+		  Object input;
+		  	System.out.println( "number 1 movie is: = " + select( input, 0 ) );
+	        System.out.println( "number 2 movie is:= " + select( input, 1 ) );
+	        System.out.println( "number 3 movie is: = " + select( input, 2 ) );
+	        System.out.println( "number 4 movie is:= " + select( input, 3 ) );
+	        System.out.println( "number 5 movie is: = " + select( input, 4 ) );
+	        System.out.println( "number 6 movie is:= " + select( input, 5) );
+	        System.out.println( "number 7 movie is:= " + select( input, 6 ) );
+	        System.out.println( "number 8 movie is:= " + select( input, 7 ) );
+	        System.out.println( "number 9 movie is:= " + select( input, 8 ) );
+	        System.out.println( "number 10 movie is:= " + select( input, 9 ) );
+	}
+
+	private static String select(Object input, int i) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public void load() throws Exception
+	{
+		Serilizer.read();
+		users = (ArrayList<Users>) Serilizer.pop();
+		movies = (ArrayList<Movies>) Serilizer.pop();
+	}
+
+	public void store() throws Exception
+	{
+		Serilizer.push(movies);
+		Serilizer.push(users);
+		Serilizer.write(); 
+	}
+
+	/**
+	 * adds a user 
+,	 */
+	public void addUsers(String forename, String surname, int age, String gender, String employment){
+		users.add(new Users(forename, surname, age, gender, employment));
+	}
+
+	/**
+	 * Removes a user from the array
+,	 */
+	
+	public void removeUser(int id){
+		users.remove(id);
+	}
+
+	/**
+	 * adds rating
+	 */
+	public void addRating(int userId, int movieId, int ratings){
+		movies.get(movieId).addRating(userId, ratings);
+	}
+
+	public void getUsersRatedMovies(int userId){
+		for(int i=0; i<movies.size(); i++){
+			if(movies.get(i).getUserRating(userId)!=0){
+			System.out.println(movies.get(i).getName() + "ratings for this: " + movies.get(i).getUserRating(userId));
+			}
+		}
+	}
+
+	public String getMovieDetails(int i){
+		return (movies.get(i).toString());
+	}
+	
+	public Users getUser(int i){
+		return users.get(i);
+	}
+	 
+	public void addMovie(String name, String date, String rottenTomatoesURL, ArrayList<String> genre){
+		movies.add(new Movies(name, date, rottenTomatoesURL, genre));
+	}
+	
+	public double getAverageRating(int movieId){
+		return movies.get(movieId).getAverageRating();
+	}
+	private boolean getTrueOrFalse(int i) {
+		if(i == 1){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+
+	//////////////////////////////////////////////////////////
+	/**
+	 * returns the top ten movies (highest first)
+	 */
+	public String getTopTen(){
+		Movies temp;
+		Movies current;
+		String str="";
+		for (int i=0; i<movies.size(); i++){
+			for(int j = 0; j< movies.size()-1; j++)
+			{
+				if(movies.get(j+1).getAverageRating()>movies.get(j).getAverageRating())
+				{
+					temp=movies.get(j+1);
+					current=movies.get(j);
+					movies.set(j, temp);
+					movies.set(j+1, current); 
+				}
+			}
+		}
+		for(int i=0; i<10; i++){
+			str += movies.get(i).toString() + "\n";
+		}
+		return str;
+	}
+	/**
+	 * the folowing quickselect method was found at http://www.michaelpollmeier.com/selecting-top-k-items-from-a-list-efficiently-in-java-groovy/
+	 * and was modified slightly to fit the project its was used to try and get the top ten but doesnt work well its been left in just to show an alternative 
+	 */
+	public class QuickSelect {
+		 
+	    
+	    public int select( int[ ] array, int k ) {
+	        return select( array, 0, array.length - 1, k );
+	    }
+	 
+	    private int select( int[ ] array, int left, int right, int k ) {
+	    	 
+	        while( true ) {
+	 
+	            if( right <= left + 1 ) { 
+	 
+	                if( right == left + 1 && array[ right ] < array[ left ] ) {
+	                    swap( array, left, right );
+	                }
+	 
+	                return array[ k ];
+	 
+	            } else {
+	 
+	                int middle = ( left + right ) >>> 1; 
+	                swap( array, middle, left + 1 );
+	 
+	                if( array[ left ] > array[ right ] ) {
+	                    swap( array, left, right );
+	                }
+	 
+	                if( array[ left + 1 ] > array[ right ] ) {
+	                    swap( array, left + 1, right );
+	                }
+	 
+	                if( array[ left ] > array[ left + 1 ] ) {
+	                    swap( array, left, left + 1 );
+	                }
+	 
+	                int i = left + 1;
+	                int j = right;
+	                int pivot = array[ left + 1 ];
+	 
+	                while( true ) { 
+	                    do i++; while( array[ i ] < pivot ); 
+	                    do j--; while( array[ j ] > pivot ); 
+	 
+	                    if( j < i ) {
+	                        break; 
+	                    }
+	 
+	                    swap( array, i, j );
+	                } 
+	 
+	                array[ left + 1 ] = array[ j ];
+	                array[ j ] = pivot;
+	 
+	                if( j >= k ) {
+	                    right = j - 1;
+	                }
+	 
+	                if( j <= k ) {
+	                    left = i;
+	                }
+	            }
+	        }
+	    }
+	 
+	    /**
+	     *the following gets a recomendation closest to the users preference  
+	     */
+	public void getUserRecommendations(int userId){
+		int value=0;
+		int user=0;
+		ArrayList<Movies> recommendations = new ArrayList<Movies>();
+		
+	
+		for(int i=1; i<users.size(); i++){
+			if(i != userId){
+				int newValue=0;
+				for(int j=0; j<movies.size()-1; j++){
+					if(movies.get(j).getUserRating(i) != 0 && movies.get(j).getUserRating(userId) != 0){ 
+						newValue+=movies.get(j).getUserRating(i)*movies.get(j).getUserRating(userId);
+					}
+				}
+				if(newValue>value){
+					value=newValue;
+					user = i;
+				}
+			}
+		}
+		for(int a=0; a<movies.size(); a++){
+			if(movies.get(a).getUserRating(userId) == 0 && movies.get(a).getUserRating(user) > 2){
+				if(recommendations.size()<10){
+					recommendations.add(movies.get(a)); //makes the array 10 in size at most
+				}
+			}
+		}
+		Movies temp;
+		Movies current;
+		for(int e=0; e<recommendations.size(); e++){
+			for(int d=0; d<recommendations.size()-1; d++){
+
+				if(recommendations.get(d+1).getAverageRating()>recommendations.get(d).getAverageRating())
+				{
+					temp=recommendations.get(d+1);
+					current=recommendations.get(d);
+					recommendations.set(d, temp);
+					recommendations.set(d+1, current); 	
+				}
+			}
+		}
+		for(int c=0; c<recommendations.size(); c++){
+			System.out.println(recommendations.get(c).toString());
+		}
+	}
+	
+	/**
+	 * Reads in the category of a movie from rottenTomatoes 
+	 * reference: http://www.omdbapi.com/
+	 *  ..............................................................................................
+	 */
+     public void readInMovie(String movie) throws IOException{
+    	 movie = "http://www.rottentomatoes.com/" + movie;
+    	 String delims = "[,]";
+    	 URL url = (new URL(movie));
+    	 BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+    	 String inputLine;
+    	 String str = "";
+    	 ArrayList<String> category = new ArrayList<>();
+    	 while ((inputLine = in.readLine()) != null){
+    		 String[] userTokens = inputLine.split(delims);
+    		 for(int i=0; i<userTokens.length; i++){
+    			for (int a=0; a<categoryNames.size(); a++){
+    				if(userTokens[i].contains(categoryNames.get(a))){
+    					category.add(userTokens[i]);
+    				}
+    			}
+    			if(userTokens[i].contains("roottenTomatoesId")){
+    				str = userTokens[i].substring(10, userTokens[i].length()-1);
+    			}
+    		 }
+			 addMovie(userTokens[0], userTokens[3], "http://www.rottentomatoes.com/" + str, category);
+    	 }
+     }
+     
+	/**
+	 * sets up an arraylist of users
+	 */
+	private void setUpArrayList(){
+		File usersFile = new File("Data/users.dat");
+		In inUsers = new In(usersFile);
+	 
+		String delims = "[|]";
+		while (!inUsers.isEmpty()) {
+			 
+			String userDetails = inUsers.readLine();
+
+			 
+			String[] userTokens = userDetails.split(delims);
+
+		 
+			if (userTokens.length == 7) {
+				addUsers(userTokens[1], userTokens[2], Integer.parseInt(userTokens[3]), userTokens[4], 
+						userTokens[5]);
+			}
+		}
+
+		File usersFile3 = new File("Data/genre.dat");
+		In inUsers = new In(usersFile3);
+		 
+		while (!inUsers.isEmpty()) {
+
+			 
+			String userDetails = inUsers.readLine();
+
+		 
+			String[] userTokens = userDetails.split(delims);
+
+		 
+			if (userTokens.length == 2) {
+				categoryNames.add(userTokens[0]);
+			}
+		}
+
+		File usersFile = new File("Data/items.dat");
+		In inUsers = new In(usersFile);
+		ArrayList<String> cat = new ArrayList<String>();
+
+		while(!inUsers.isEmpty()){
+			cat = new ArrayList<String>();
+			
+			String userDetails = inUsers.readLine();
+		
+			String[] userTokens = userDetails.split(delims);
+			
+			if(userTokens.length == 23){
+				for(int i=4; i<23; i++){
+					if(getTrueOrFalse(Integer.parseInt(userTokens[i]))){
+						String str = categoryNames.get(i-4);
+						cat.add(str);
+					}
+				}
+				addMovie(userTokens[1], userTokens[2], userTokens[3], cat);
+			}
+		}
+
+		File ratingsFile = new File("Data/ratings.dat");
+		 
+
+		 
+	}
+}
+
+	public void swap(int[] array, int left, int right) {
+		int a;
+		 
+		  int temp = array[ a ];
+	        int b;
+			array[ a ] = array[ b ];
+	        array[ b ] = temp;
+	}
+	}
