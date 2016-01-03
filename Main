@@ -1,0 +1,104 @@
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import asg.cliche.Command;
+import asg.cliche.Param;
+import asg.cliche.Shell;
+import asg.cliche.ShellFactory;
+
+import com.google.common.base.Optional;
+/** 
+ * @author Adam O Reilly
+ * i had followed labs that i had downloaded prior to the exam and used the web to find new things or
+ *  varients of existing lessons the code is not the best quaility i tried mackin an XML class but was unable too so i put in what 
+ *  i thought may have been nessacary for the rest of the code from examples
+ * 
+ */
+
+public class Main
+{
+  private Recomender recommender;
+
+  public Main() throws Exception
+  {
+	   File datastore = new File("moviedata.xml");
+	   Serilizer serializer = new Serilizer(datastore);
+
+	    recommender = new Recommender(Serilizer);
+	    if (datastore.isFile())
+	    {
+	      recommender.load();
+	    }
+	    recommender.store();
+  }
+
+  public static void main(String[] args) throws Exception
+  {
+    Main main = new Main();
+    
+
+    Shell shell = ShellFactory.createConsoleShell("Welcome to the movies recommeder console - ?help for instructions", main);
+    shell.commandLoop();
+    
+    main.recommender.store();
+  }
+
+  @Command(description="Create a User")
+  public void createUser (@Param(name="forename name") String forename, (name="surname name") String surname, 
+                          @Param(name="age")      int age,     @Param(name="gender")  String gender,	
+                          @Param(name="employment")		String employment)
+  {
+    recommender.addUsers(forename, surname, age, gender, employment);
+  }
+
+  
+  @Command(description="Get a Movie")
+  public void getMovie(@Param(name="id") int id)
+  {
+	  System.out.println(recommender.getMovieDetails(id-1));
+  }
+  
+  @Command(description="Delete User")
+  public void deleteUser (@Param(name="id") int id)
+  {
+    recommender.removeUser(id);
+  }
+  
+  @Command(description="Add a rating")
+  public void addRating(@Param(name="user id") int userId, @Param(name="movie id") int movieId, @Param(name="rating") int ratings){
+	  recommender.addRating(userId, movieId, ratings);
+  }
+  
+  @Command(description="Get Users Ratings")
+  public void getUsersRatings(@Param(name="user id") int userId){
+	  recommender.getUsersRatedMovies(userId);
+  }
+  
+  @Command(description="Create a new movie")
+  public void createMovie (@Param(name="name the new movie") String name) throws IOException
+  {
+	  recommender.readInMovie(name);
+  }
+  
+  @Command(description="Recommend Moves")
+  public void getRecommendedMovies(@Param(name="user id") int userId)
+  {
+	  recommender.getUserRecommendations(userId);
+  }
+  
+ 
+  
+  @Command(description="Get Top Ten Movies")
+  public void getTopTen(){
+	  System.out.println(recommender.getTopTen());
+  }
+  
+ 
+  @Command(description="Get Average Ratings")
+  public void getAverageRating(@Param(name="movie id") int movieId)
+  {
+	  System.out.println(recommender.getAverageRating(movieId));
+  }
+  
+}
