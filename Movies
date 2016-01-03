@@ -1,0 +1,135 @@
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.Date;
+
+
+
+public class Movies {
+
+	
+	private String name;
+	private String date;
+	 private long movieID;
+	private String rottenTomatoesURL;
+	private ArrayList<String> genre;
+    private Hashtable<Integer, Integer> ratings;
+    private static long counter = 1;
+    
+	/**
+	 * Constructor for movies
+	 */
+    
+	public Movies(String title, String date, String rottenTomatoesURL, ArrayList<String> categories){
+		this.movieID=counter++;
+		this.name=name;
+		this.date=date;
+		this.rottenTomatoesURL=rottenTomatoesURL;
+		this.genre=genre;
+		ratings = new Hashtable<Integer, Integer>();
+	}
+ 
+	/**
+	 * the following two methods
+	 * sets the name
+	 * and
+	 * gets the name
+	 */	 
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	/**
+	 * the following two methods
+	 * sets the movies id
+	 * and
+	 * gets the movies id
+	 */	 
+	 	
+	public void setMovieID(int i){
+		movieID=i;
+	}
+	
+	public long getMovieID(){
+		return movieID;
+	}
+	
+	/**
+	 * the following two methods
+	 * sets the date
+	 * and
+	 * gets the date
+	 */	 
+	 
+	public void setDate(String date) {
+		this.date = date;
+	}
+
+	
+	public String getDate() {
+		return date;
+	}
+
+	/**
+	 * the following two methods
+	 * sets the URL for the movie on rottentomatoes
+	 * and
+	 * gets the URL for the movie on rottentomatoes
+	 */	 
+	public String getRottenTomatoesURL() {
+		return rottenTomatoesURL;
+	}
+	 
+	 
+	public void addRating(int userId,int ratings){
+		this.ratings.put(userId, ratings);
+	}
+	
+	 
+	public Integer getUserRating(int userId){
+			if(ratings.containsKey(userId)){
+				return ratings.get(userId);
+			}
+			return 0;
+	}
+	
+	/**
+	 * returns the average rating of the movie
+	 */
+	public double getAverageRating(){
+		double sum=0.0;
+		int b=0;
+		Enumeration<Integer> e = ratings.elements();
+		while(e.hasMoreElements()){
+			int a=e.nextElement();
+			if(a!=0){
+			sum+=a;
+			}
+			else{
+				b++;
+			}
+		}
+		
+		return toTwoDecimalPlaces(sum/ratings.size()-b);
+	}
+	
+	
+	private double toTwoDecimalPlaces(double num)
+	{
+		return (int) (num *100 ) /100.0; 
+	}
+	
+	 
+	@Override
+	public String toString() {
+		return "Movies [name=" + name + ", date=" + date + ", rottentomatoes="
+				+ rottenTomatoesURL + ", categories=" + genre + ", movieID="
+				+ movieID + ", rating=" + getAverageRating() + "]";
+	}
+	
+	
+}
